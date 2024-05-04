@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+. "${0%/*}/includes.sh"
+
+if [ -d /usr/share/rbenv/shims ]; then
+	PATH=/usr/share/rbenv/shims:$PATH
+	RBENV_VERSION=2.1.2-github
+	RUBY_VERSION=2.1.2-github
+	export PATH RBENV_VERSION RUBY_VERSION
+fi
+
+cmd 'git log -n 1 HEAD | cat'
+cmd 'ruby -v'
+cmd 'bundle -v'
+
+# Clean out any unversioned files
+cmd 'git clean -fd'
+
+cmd 'script/bootstrap'
+cmd 'bundle exec rake samples'
+cmd 'bundle exec rake'

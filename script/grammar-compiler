@@ -1,0 +1,21 @@
+#!/bin/sh
+# shellcheck disable=SC2016
+set -e
+. "${0%/*}/includes.sh"
+cd_root
+
+image="linguist/grammar-compiler:latest"
+cmd 'mkdir -p grammars'
+
+if [ -z "$REBUILD" ]; then
+	cmd "docker pull $image"
+else
+	cmd 'cd tools/grammars'
+	cmd 'image=`docker build -q .`'
+	cmd 'cd "../.."'
+fi
+
+cmd 'exec docker run --rm' \
+	-u "`id -u "$USER"`:`id -g "$USER"`" \
+	-v "$PWD:/src/linguist" \
+	-w /src/linguist "$image" "$@"
